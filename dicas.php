@@ -1,40 +1,39 @@
 <?php
-// dicas.php - formulário POST para salvar dicas em um arquivo JSON simples
+
 $arquivo = __DIR__ . '/tips.json';
 $hoje = date('d/m/Y');
 $time = date('H:i');
 $titulos = ["Dicas de Viagem", "Compartilhe uma dica"];
 
-// cria arquivo se não existir
+
 if (!file_exists($arquivo)) {
     file_put_contents($arquivo, json_encode([]));
 }
 
-// ler dicas existentes
+
 $tips_json = file_get_contents($arquivo);
 $tips = json_decode($tips_json, true);
 if (!is_array($tips)) $tips = [];
 
-// processamento de POST
+
 $submitted = false;
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = isset($_POST['nome']) ? trim($_POST['nome']) : 'Anônimo';
     $dica = isset($_POST['dica']) ? trim($_POST['dica']) : '';
-    // validação simples
+
     if ($dica === '') {
         $message = 'Escreva uma dica antes de enviar.';
     } else {
-        // sanitiza e adiciona
         $entry = [
             'nome' => htmlspecialchars($nome, ENT_QUOTES, 'UTF-8'),
             'dica' => htmlspecialchars($dica, ENT_QUOTES, 'UTF-8'),
             'data' => date('d/m/Y'),
             'hora' => date('H:i')
         ];
-        // adiciona no topo
+        
         array_unshift($tips, $entry);
-        // salva de volta
+        
         file_put_contents($arquivo, json_encode($tips, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $submitted = true;
         $message = 'Dica salva com sucesso! Obrigado por contribuir.';
@@ -71,7 +70,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="message"><?php echo $message; ?></p>
       <?php endif; ?>
 
-      <!-- Formulário que utiliza POST -->
       <form method="post" action="dicas.php" class="form-box" aria-label="Formulário para enviar dica de viagem">
         <label for="nome">Seu nome (opcional)</label>
         <input id="nome" name="nome" type="text" placeholder="Seu nome">
@@ -85,11 +83,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <h3>Últimas dicas enviadas</h3>
 
       <?php
-      // Uso de if...else para verificar se há dicas
+
       if (count($tips) === 0) {
           echo '<p class="alert">Ainda não há dicas. Seja o primeiro a enviar!</p>';
       } else {
-          // uso de foreach para exibir dicas
+
           echo '<ul class="tips-list">';
           foreach ($tips as $t) {
               echo '<li class="tip">';
